@@ -1,3 +1,10 @@
+//
+//  main.hpp
+//  MyFirstTactics
+//
+//  Created by Nathan Johnston and Lloyd Livengood on 9/16/24.
+//
+
 #include <iostream>
 #include "character.hpp"
 
