@@ -25,7 +25,7 @@ cmake_minimum_required(VERSION 3.15)
 project(MyFirstTactics)
 
 #the project contains an executable named testSFML that uses the following cpp files
-add_executable(MyFirstTactics src/tactics.cpp src/tactics.hpp)
+add_executable(MyFirstTactics src/main.cpp)
 
 #create a folder named "cmake" at the top of your project and put the
 #findSFML.cmake file in it.  This line tells Cmake to look there for
