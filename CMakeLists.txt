@@ -6,8 +6,8 @@
 #mkdir xcode
 #cd xcode
 #cmake -G Xcode .. #tells cmake to make an XCode project, and that the CMakelists.txt file is in the directory above
-#you can then open the asteroids.xcodeproj file with xcode
-#in product -> scheme, select asteroids to run that executable when you press
+#you can then open the MyFirstTactics.xcodeproj file with xcode
+#in product -> scheme, select MyFirstTactics to run that executable when you press
 #the play button
 
 # to use make, I do something like
@@ -15,7 +15,7 @@
 #cd build
 #cmake .. #by default it creates a makefile for you
 #make #calls the make command which looks in Makefile to see what to do
-#./asteroids  #run the resulting file
+#./MyFirstTactics  #run the resulting file
 
 
 #use a recent version of CMake
@@ -38,7 +38,7 @@ add_executable(MyFirstTactics src/main.cpp src/character.hpp)
 #used below
 find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 
-#tells Cmake that the asteroids executable needs to be linked with SFML
+#tells Cmake that the MyFirstTactics executable needs to be linked with SFML
 target_link_libraries(MyFirstTactics sfml-graphics sfml-system sfml-window)
 
 #passes an option to clang when compiling to use recent c++ stuff
