@@ -61,8 +61,8 @@ public:
 
 
 sf::CircleShape Character::render() {
-    sf::CircleShape shape(50.f);
-    shape.setFillColor(sf::Color(100,250,50));
+    sf::CircleShape shape(getHP(), getShapeClass());
+    shape.setFillColor(sf::Color(getATK(),getDEF(),getSPD()));
     return shape;
 }
 

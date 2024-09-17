@@ -45,7 +45,7 @@ int main() {
         //call everything visual in between these two
         
         
-        Character testGuy = Character();
+        Character testGuy = Character(100,23,255,200,5);
         sf::CircleShape displayTestGuy = testGuy.render();
         
         window.draw(displayTestGuy);
