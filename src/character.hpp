@@ -32,13 +32,13 @@ public:
         font.loadFromFile("ProtestGuerrilla-Regular.ttf");
     }
     
-    Character(int newHP, int newATK, int newDEF, int newSPD, int newShapeClass) {        // Param'd constructor
+    Character(int newHP, int newATK, int newDEF, int newSPD, int newShapeClass, sf::Font newFont) {        // Param'd constructor
         HP = newHP;
         ATK = newATK;
         DEF = newDEF;
         SPD = newSPD;
         shapeClass = newShapeClass;
-        font.loadFromFile("ProtestGuerrilla-Regular.ttf");
+        font = newFont;
     }
     
     // Get methods for private stats
@@ -59,13 +59,13 @@ public:
     sf::CircleShape render();               // Define a shape to be drawn representing the character
 
     // TODO WINDOW FOR PLAYER SHAPE STATS
-    sf::RectangleShape statsWindow(sf::RenderWindow &window) {
+    sf::RectangleShape statsWindow(sf::RenderWindow &window, int positionX, int positionY) {
         // Create the rectangle
         sf::RectangleShape rectangle;
         rectangle.setSize(sf::Vector2f(150, 100));
         rectangle.setOutlineColor(sf::Color::Red);
         rectangle.setOutlineThickness(3);
-        rectangle.setPosition(800, 650);
+        rectangle.setPosition(positionX, positionY);
 
         sf::Text HPLine;
         std::string HPString = std::to_string(getHP());
@@ -204,29 +204,5 @@ void renderObjects(const std::vector<sf::Drawable*> & objects, sf::RenderWindow 
         
     }
 }
-
-static void testChar() {
-    Character testGet = Character(1,2,3,4,5);
-    assert(testGet.getHP() == 1);
-    assert(testGet.getATK() == 2);
-    assert(testGet.getDEF() == 3);
-    assert(testGet.getSPD() == 4);
-    assert(testGet.getShapeClass() == 5);
-}
-
-static void testSetGet() {
-    Character testSet = Character();
-    testSet.setHP(999);
-    assert(testSet.getHP() == 999);
-    testSet.setATK(888);
-    assert(testSet.getATK() == 888);
-    testSet.setDEF(77);
-    assert(testSet.getDEF() == 77);
-    testSet.setSPD(-1);
-    assert(testSet.getSPD() == -1);
-    testSet.setShapeClass(66666);
-    assert(testSet.getShapeClass() == 66666);
-}
-
 
 #endif /* character_hpp */

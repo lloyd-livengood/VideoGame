@@ -16,8 +16,14 @@ int main() {
     int playerAction = 0;
     std::srand(static_cast<unsigned>( int(time(nullptr))));
     
-    Character player = Character(100,23,255,200,5);
-    Character enemy = Character(100,255,150,200,5);
+    //Load font once;
+    sf::Font font;
+    while(!(font.loadFromFile("ProtestGuerrilla-Regular.ttf"))){
+        font.loadFromFile("ProtestGuerrilla-Regular.ttf");
+    }
+    Character player = Character(100,23,255,200,5,font);
+    Character enemy = Character(100,255,150,200,5,font);
+    
     
     while (window.isOpen()) {
         sf::Event event;
@@ -46,7 +52,7 @@ int main() {
         sf::CircleShape displayPlayer = player.render();
         displayPlayer.setPosition(20, 550);
         window.draw(displayPlayer);
-        player.statsWindow(window);
+        player.statsWindow(window,800,650);
         player.actionWindow(window);
         
         
@@ -54,6 +60,7 @@ int main() {
         sf::CircleShape displayEnemy = enemy.render();
         displayEnemy.setPosition(600, 20);
         window.draw(displayEnemy);
+        enemy.statsWindow(window,10,10);
             
         if (playerAction != 0){                                     // Battle resolution
             if(player.getSPD() - enemy.getSPD() >= 0){              // if the player is faster
