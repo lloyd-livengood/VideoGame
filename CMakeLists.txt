@@ -20,12 +20,15 @@
 
 #use a recent version of CMake
 cmake_minimum_required(VERSION 3.15)
+set(SRCDIR ./src)
 
 #the project is called Tactics
 project(MyFirstTactics)
 
+file(GLOB SOURCE_FILES "${SRCDIR}/*")
+
 #the project contains an executable named testSFML that uses the following cpp files
-add_executable(MyFirstTactics src/main.cpp src/character.hpp)
+add_executable(MyFirstTactics ${SOURCE_FILES})
 
 #create a folder named "cmake" at the top of your project and put the
 #findSFML.cmake file in it.  This line tells Cmake to look there for

@@ -10,10 +10,11 @@
 
 #include <stdio.h>
 #include <SFML/Graphics.hpp>
-
+#include <SFML/Window.hpp>
+#include <vector>
 
 class Character {
-    //Stats that define a character
+private:
     int HP;
     int ATK;
     int DEF;
@@ -21,9 +22,7 @@ class Character {
     int shapeClass;
     
 public:
-    
-    // Default Constructor
-    Character(){
+    Character(){                // Default Constructor
         HP = 1;
         ATK = 1;
         DEF = 1;
@@ -31,8 +30,7 @@ public:
         shapeClass = 1;
     }
     
-    // Constructor
-    Character(int newHP, int newATK, int newDEF, int newSPD, int newShapeClass){
+    Character(int newHP, int newATK, int newDEF, int newSPD, int newShapeClass){        // Param'd constructor
         HP = newHP;
         ATK = newATK;
         DEF = newDEF;
@@ -54,8 +52,27 @@ public:
     void setSPD(int newSPD) {SPD = newSPD;}
     void setShapeClass(int newShapeClass) {shapeClass = newShapeClass;}
     
-    // Define a shape to be drawn representing the character
-    sf::CircleShape render();
+    sf::CircleShape render();               // Define a shape to be drawn representing the character
+
+    // TODO WINDOW FOR PLAYER SHAPE STATS
+    // TODO WINDOW FOR PLAYER ACTIONS
+    // TODO WINDOW FOR ENEMY SHAPE STATS
+    // TODO ENEMY GENERATOR, calculate stats based on duration of "run", higher randomized stats based on run duration
+    // TODO ATTACK ACTION
+    // RELATED TODO, HEALTH CHECK after any damage dealt
+            // if player HP = 0, game over
+                //TODO GAME OVER SCREEN
+            // if enemy hp = 0, Victory screen, then generate new enemy
+    // TODO BUFF ACTION
+    // TODO DEBUFF ACTION
+    // TODO CAPTURE ACTION
+    // TODO BUMP MOTION FOR ATTACKS
+    // TODO FLICKER FOR TAKING DAMAGE
+    // TODO PLAYER PHASE
+    // TODO BATTLE PHASE
+    
+    // potential TODO of "resolution" depending on boolean states set by player/enemy hp
+    
 };
 
 
@@ -66,7 +83,34 @@ sf::CircleShape Character::render() {
     return shape;
 }
 
+void renderObjects(const std::vector<sf::Drawable*> & objects, sf::RenderWindow & window){
+    for (auto object: objects){
+        
+    }
+}
 
+static void testChar() {
+    Character testGet = Character(1,2,3,4,5);
+    assert(testGet.getHP() == 1);
+    assert(testGet.getATK() == 2);
+    assert(testGet.getDEF() == 3);
+    assert(testGet.getSPD() == 4);
+    assert(testGet.getShapeClass() == 5);
+}
+
+static void testSetGet() {
+    Character testSet = Character();
+    testSet.setHP(999);
+    assert(testSet.getHP() == 999);
+    testSet.setATK(888);
+    assert(testSet.getATK() == 888);
+    testSet.setDEF(77);
+    assert(testSet.getDEF() == 77);
+    testSet.setSPD(-1);
+    assert(testSet.getSPD() == -1);
+    testSet.setShapeClass(66666);
+    assert(testSet.getShapeClass() == 66666);
+}
 
 
 #endif /* character_hpp */
