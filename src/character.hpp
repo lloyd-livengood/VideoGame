@@ -20,19 +20,19 @@ private:
     int DEF;
     int SPD;
     int shapeClass;
-    sf::Font font;
+    std::shared_ptr<sf::Font> font;
     
 public:
-    Character(){  // Default Constructor
-        HP = 1;
-        ATK = 1;
-        DEF = 1;
-        SPD = 1;
-        shapeClass = 3;
-        font.loadFromFile("ProtestGuerrilla-Regular.ttf");
-    }
+//    Character(){  // Default Constructor
+//        HP = 1;
+//        ATK = 1;
+//        DEF = 1;
+//        SPD = 1;
+//        shapeClass = 3;
+//        font.loadFromFile("ProtestGuerrilla-Regular.ttf");
+//    }
     
-    Character(int newHP, int newATK, int newDEF, int newSPD, int newShapeClass, sf::Font newFont) {        // Param'd constructor
+    Character(int newHP, int newATK, int newDEF, int newSPD, int newShapeClass, std::shared_ptr<sf::Font> newFont) {        // Param'd constructor
         HP = newHP;
         ATK = newATK;
         DEF = newDEF;
@@ -42,7 +42,7 @@ public:
     }
     
     // A constructor for randomly generating a character of a given power level;
-    Character(double roundIncrementer, sf::Font newFont) {
+    Character(double roundIncrementer, std::shared_ptr<sf::Font> newFont) {
         int distributionTotal = 100 * roundIncrementer;
         
         int distribution = 100 - (rand() % distributionTotal);
@@ -70,7 +70,7 @@ public:
     int getDEF() {return DEF;}
     int getSPD() {return SPD;}
     int getShapeClass() {return shapeClass;}
-    sf::Font getFont() {return font;}
+    std::shared_ptr<sf::Font> getFont() {return font;}
   
     // Set methods for private stats
     void setHP(int newHP) {HP = newHP;}
@@ -100,7 +100,7 @@ public:
 
         sf::Text HPLine;
         std::string HPString = std::to_string(getHP());
-        HPLine.setFont(font); // Set the loaded font
+        HPLine.setFont(*font); // Set the loaded font
         HPLine.setString("HP: " + HPString); // Set the string to display
         HPLine.setCharacterSize(20); // Set the text size
         HPLine.setFillColor(sf::Color::Black); // Set the text color
@@ -108,7 +108,7 @@ public:
         
         sf::Text ATKLine;
         std::string ATKString = std::to_string(getATK());
-        ATKLine.setFont(font);
+        ATKLine.setFont(*font);
         ATKLine.setString("ATK: " + ATKString);
         ATKLine.setCharacterSize(20);
         ATKLine.setFillColor(sf::Color::Black);
@@ -116,7 +116,7 @@ public:
 
         sf::Text DEFLine;
         std::string DEFString = std::to_string(getDEF());
-        DEFLine.setFont(font);
+        DEFLine.setFont(*font);
         DEFLine.setString("DEF: " + DEFString);
         DEFLine.setCharacterSize(20);
         DEFLine.setFillColor(sf::Color::Black);
@@ -124,7 +124,7 @@ public:
         
         sf::Text SPDLine;
         std::string SPDString = std::to_string(getSPD());
-        SPDLine.setFont(font);
+        SPDLine.setFont(*font);
         SPDLine.setString("SPD: " + SPDString);
         SPDLine.setCharacterSize(20);
         SPDLine.setFillColor(sf::Color::Black);
@@ -147,21 +147,21 @@ public:
         rectangle.setPosition(425, 650);
         
         sf::Text attack;
-        attack.setFont(font); // Set the loaded font
+        attack.setFont(*font); // Set the loaded font
         attack.setString("1. Attack" ); // Set the string to display
         attack.setCharacterSize(20); // Set the text size
         attack.setFillColor(sf::Color::Black); // Set the text color
         attack.setPosition(rectangle.getPosition().x + 10, rectangle.getPosition().y + 10); // Position inside the rectangle
         
         sf::Text capture;
-        capture.setFont(font); // Set the loaded font
+        capture.setFont(*font); // Set the loaded font
         capture.setString("2. Capture" ); // Set the string to display
         capture.setCharacterSize(20); // Set the text size
         capture.setFillColor(sf::Color::Black); // Set the text color
         capture.setPosition(rectangle.getPosition().x + 10, rectangle.getPosition().y + 30); // Position inside the rectangle
         
         sf::Text debuff10;
-        debuff10.setFont(font); // Set the loaded font
+        debuff10.setFont(*font); // Set the loaded font
         debuff10.setString("3. Debuff 10%" ); // Set the string to display
         debuff10.setCharacterSize(20); // Set the text size
         debuff10.setFillColor(sf::Color::Black); // Set the text color

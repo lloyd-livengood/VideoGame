@@ -17,14 +17,15 @@ int main() {
     std::srand(static_cast<unsigned>( int(time(nullptr))));
     
     //Load font once;
-    sf::Font font;
-    while(!(font.loadFromFile("ProtestGuerrilla-Regular.ttf"))){
-        font.loadFromFile("ProtestGuerrilla-Regular.ttf");
-    }
+    
+    sf::Font* font = new sf::Font();
+    std::shared_ptr<sf::Font> fontPointer(font);
+    sf::Font& fontRef = *fontPointer;
+    (*fontPointer).loadFromFile("ProtestGuerrilla-Regular.ttf");
     
     int roundIncrementer = 0;
-    Character player = Character(1, font);                         // player first generation
-    Character enemy = Character(1, font);        // enemy first generation
+    Character player = Character(1, fontPointer);                         // player first generation
+    Character enemy = Character(1, fontPointer);        // enemy first generation
      
     
     while (window.isOpen()) {
@@ -98,7 +99,7 @@ int main() {
             assert(player.alive());
             if(!enemy.alive()) {                                    // if the enemy is slain/capt
                 roundIncrementer++;                                 // next round
-                enemy = Character(1 + roundIncrementer*.1, font);       // gen new enemy with 10% stronger stats
+                enemy = Character(1 + roundIncrementer*.1, fontPointer);       // gen new enemy with 10% stronger stats
             }
             player.setHP(player.getHP()*1.2);                       // player regains 10% HP
         }
