@@ -23,15 +23,6 @@ private:
     std::shared_ptr<sf::Font> font;
     
 public:
-//    Character(){  // Default Constructor
-//        HP = 1;
-//        ATK = 1;
-//        DEF = 1;
-//        SPD = 1;
-//        shapeClass = 3;
-//        font.loadFromFile("ProtestGuerrilla-Regular.ttf");
-//    }
-    
     Character(int newHP, int newATK, int newDEF, int newSPD, int newShapeClass, std::shared_ptr<sf::Font> newFont) {        // Param'd constructor
         HP = newHP;
         ATK = newATK;
@@ -48,14 +39,17 @@ public:
         int distribution = 100 - (rand() % distributionTotal);
         HP = 10 + distribution;
         distributionTotal -= distribution;
+        distributionTotal++;
   
         distribution = distributionTotal - (rand() % (distributionTotal));
-        ATK = 10 + distribution;
+        ATK = 9 + distribution;
         distributionTotal -= distribution;
+        distributionTotal++;
         
         distribution = distributionTotal - (rand() % (distributionTotal));
-        DEF = 10 + distribution;
+        DEF = 9 + distribution;
         distributionTotal -= distribution;
+        distributionTotal++;
         
         SPD = distributionTotal;
         
@@ -202,14 +196,15 @@ public:
     }
     
     void capture(Character &rhs){
-        int captureChance = (getHP()*getSPD()) / (rhs.getHP()*rhs.getSPD());
+        int captureChance = 50 - (rhs.getHP() - getHP() + rhs.getSPD() - getSPD());
+        
         if( captureChance > (rand() % 100)) {
             ATK += rhs.getATK();
             DEF += rhs.getDEF();
             SPD += rhs.getSPD();
             shapeClass += 1;
+            rhs.setHP(0);
         }
-        rhs.setHP(0);
     }
     
     void debuff10(Character &rhs){
