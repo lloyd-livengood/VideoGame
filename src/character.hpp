@@ -42,15 +42,25 @@ public:
     }
     
     // A constructor for randomly generating a character of a given power level;
-    Character(int powerLevel, sf::Font newFont) {
-        HP = 10 + (rand() % powerLevel);
-        powerLevel -= HP;
-        ATK = 10 + rand() % powerLevel;
-        powerLevel -= ATK;
-        DEF = 10 + rand() % powerLevel;
-        powerLevel -= DEF;
-        SPD = powerLevel;
+    Character(double roundIncrementer, sf::Font newFont) {
+        int distributionTotal = 100 * roundIncrementer;
+        
+        int distribution = 100 - (rand() % distributionTotal);
+        HP = 10 + distribution;
+        distributionTotal -= distribution;
+  
+        distribution = distributionTotal - (rand() % (distributionTotal));
+        ATK = 10 + distribution;
+        distributionTotal -= distribution;
+        
+        distribution = distributionTotal - (rand() % (distributionTotal));
+        DEF = 10 + distribution;
+        distributionTotal -= distribution;
+        
+        SPD = distributionTotal;
+        
         shapeClass = 3 + (rand() % 4);
+        
         font = newFont;
     }
     
@@ -199,6 +209,7 @@ public:
             SPD += rhs.getSPD();
             shapeClass += 1;
         }
+        rhs.setHP(0);
     }
     
     void debuff10(Character &rhs){

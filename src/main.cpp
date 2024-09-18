@@ -21,8 +21,10 @@ int main() {
     while(!(font.loadFromFile("ProtestGuerrilla-Regular.ttf"))){
         font.loadFromFile("ProtestGuerrilla-Regular.ttf");
     }
-    Character player = Character(100, font);
-    Character enemy = Character(100, font);
+    
+    int roundIncrementer = 0;
+    Character player = Character(1, font);                         // player first generation
+    Character enemy = Character(1, font);        // enemy first generation
      
     
     while (window.isOpen()) {
@@ -92,11 +94,13 @@ int main() {
                         break;
                 }
             }
-            playerAction=0;3
+            playerAction=0;
             assert(player.alive());
-            if(!enemy.alive()) {
-                enemy = Character(player.getHP()+player.getATK()+player.getDEF()+player.getSPD(), font);
+            if(!enemy.alive()) {                                    // if the enemy is slain/capt
+                roundIncrementer++;                                 // next round
+                enemy = Character(1 + roundIncrementer*.1, font);       // gen new enemy with 10% stronger stats
             }
+            player.setHP(player.getHP()*1.2);                       // player regains 10% HP
         }
         
         
