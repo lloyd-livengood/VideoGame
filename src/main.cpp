@@ -21,9 +21,9 @@ int main() {
     while(!(font.loadFromFile("ProtestGuerrilla-Regular.ttf"))){
         font.loadFromFile("ProtestGuerrilla-Regular.ttf");
     }
-    Character player = Character(100,23,255,200,5,font);
-    Character enemy = Character(100,255,150,200,5,font);
-    
+    Character player = Character(100, font);
+    Character enemy = Character(100, font);
+     
     
     while (window.isOpen()) {
         sf::Event event;
@@ -92,7 +92,11 @@ int main() {
                         break;
                 }
             }
-            playerAction=0;
+            playerAction=0;3
+            assert(player.alive());
+            if(!enemy.alive()) {
+                enemy = Character(player.getHP()+player.getATK()+player.getDEF()+player.getSPD(), font);
+            }
         }
         
         

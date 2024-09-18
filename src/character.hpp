@@ -23,12 +23,12 @@ private:
     sf::Font font;
     
 public:
-    Character(){                // Default Constructor
+    Character(){  // Default Constructor
         HP = 1;
         ATK = 1;
         DEF = 1;
         SPD = 1;
-        shapeClass = 1;
+        shapeClass = 3;
         font.loadFromFile("ProtestGuerrilla-Regular.ttf");
     }
     
@@ -38,6 +38,19 @@ public:
         DEF = newDEF;
         SPD = newSPD;
         shapeClass = newShapeClass;
+        font = newFont;
+    }
+    
+    // A constructor for randomly generating a character of a given power level;
+    Character(int powerLevel, sf::Font newFont) {
+        HP = 10 + (rand() % powerLevel);
+        powerLevel -= HP;
+        ATK = 10 + rand() % powerLevel;
+        powerLevel -= ATK;
+        DEF = 10 + rand() % powerLevel;
+        powerLevel -= DEF;
+        SPD = powerLevel;
+        shapeClass = 3 + (rand() % 4);
         font = newFont;
     }
     
@@ -56,7 +69,15 @@ public:
     void setSPD(int newSPD) {SPD = newSPD;}
     void setShapeClass(int newShapeClass) {shapeClass = newShapeClass;}
     
-    sf::CircleShape render();               // Define a shape to be drawn representing the character
+    // Define a shape to be drawn representing the character
+    sf::CircleShape render() {
+        sf::CircleShape shape(getHP()+20, getShapeClass());
+        shape.setOutlineColor(sf::Color::White);
+        shape.setOutlineThickness(5);
+        int totalStats = getATK() + getDEF() + getSPD();
+        shape.setFillColor(sf::Color(255 * (getATK() / totalStats), 255 * (getDEF() / totalStats), 255 * (getSPD() / totalStats)));
+        return shape;
+    }
 
     // TODO WINDOW FOR PLAYER SHAPE STATS
     sf::RectangleShape statsWindow(sf::RenderWindow &window, int positionX, int positionY) {
@@ -136,9 +157,6 @@ public:
         debuff10.setFillColor(sf::Color::Black); // Set the text color
         debuff10.setPosition(rectangle.getPosition().x + 10, rectangle.getPosition().y + 50); // Position inside the rectangle
 
-        
-        
-        
         window.draw(rectangle);
         window.draw(attack);
         window.draw(capture);
@@ -148,17 +166,17 @@ public:
     
     
     
-    // TODO WINDOW FOR PLAYER ACTIONS
-    // TODO WINDOW FOR ENEMY SHAPE STATS
+    // TODO WINDOW FOR PLAYER ACTIONS **completed
+    // TODO WINDOW FOR ENEMY SHAPE STATS **completed
     // TODO ENEMY GENERATOR, calculate stats based on duration of "run", higher randomized stats based on run duration
-    // TODO ATTACK ACTION
+    // TODO ATTACK ACTION **completed
     // RELATED TODO, HEALTH CHECK after any damage dealt
             // if player HP = 0, game over
                 //TODO GAME OVER SCREEN
             // if enemy hp = 0, Victory screen, then generate new enemy
     // TODO BUFF ACTION
-    // TODO DEBUFF ACTION
-    // TODO CAPTURE ACTION
+    // TODO DEBUFF ACTION ** completed
+    // TODO CAPTURE ACTION ** completed
     // TODO BUMP MOTION FOR ATTACKS
     // TODO FLICKER FOR TAKING DAMAGE
     // TODO PLAYER PHASE
@@ -179,7 +197,7 @@ public:
             ATK += rhs.getATK();
             DEF += rhs.getDEF();
             SPD += rhs.getSPD();
-            shapeClass += rhs.getShapeClass();
+            shapeClass += 1;
         }
     }
     
@@ -189,15 +207,11 @@ public:
         rhs.setSPD(rhs.getSPD()*.9);
     }
     
+    bool alive() {
+        return getHP() > 0;
+    }
 };
 
-
-
-sf::CircleShape Character::render() {
-    sf::CircleShape shape(getHP(), getShapeClass());
-    shape.setFillColor(sf::Color(getATK(),getDEF(),getSPD()));
-    return shape;
-}
 
 void renderObjects(const std::vector<sf::Drawable*> & objects, sf::RenderWindow & window){
     for (auto object: objects){
