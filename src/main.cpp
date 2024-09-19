@@ -10,103 +10,24 @@
 #include "character.hpp"
 
 int main() {
-//    testChar();
-//    testSetGet();
+    std::shared_ptr<sf::Font> fontPointer = fontLoader(); //Load font once;
+    std::srand(static_cast<unsigned>( int(time(nullptr)))); // random seed for random purposes
+    int roundIncrementer = 0, playerAction = 0; // inits
+    Character player = Character(1, fontPointer); // player initial generation
+    Character enemy = Character(0.8, fontPointer); // enemy initial generation, .8 for initial weaker start to give player chance
+    
     sf::RenderWindow window (sf::VideoMode(1000,800), "Polymons");
-    int playerAction = 0;
-    std::srand(static_cast<unsigned>( int(time(nullptr))));
-    
-    //Load font once;
-    
-    sf::Font* font = new sf::Font();
-    std::shared_ptr<sf::Font> fontPointer(font);
-    sf::Font& fontRef = *fontPointer;
-    (*fontPointer).loadFromFile("ProtestGuerrilla-Regular.ttf");
-    
-    int roundIncrementer = 0;
-    Character player = Character(1, fontPointer);                         // player first generation
-    Character enemy = Character(1, fontPointer);        // enemy first generation
-     
-    
     while (window.isOpen()) {
-        sf::Event event;
-        
-        while (window.pollEvent(event)) {               // listening to key presses
-            if (event.type == sf::Event::Closed)
-                window.close();
-            
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num1 ) {
-                std::cout << "player action 1" << std::endl;
-                playerAction = 1;
-            }
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num2) {
-                std::cout << "player action 2" << std::endl;
-                playerAction = 2;
-            }
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num3) {
-                std::cout << "player action 3" << std::endl;
-                playerAction = 3;
-            }
-         }
-        
-        window.clear(sf::Color::Black);                              // set black window
+        window.clear(sf::Color::Black); // set black window
 
-        // TODO create player char on first, carry over on victory
-        sf::CircleShape displayPlayer = player.render();
-        displayPlayer.setPosition(20, 550);
-        window.draw(displayPlayer);
-        player.statsWindow(window,800,650);
-        player.actionWindow(window);
+        sf::Event event;
+        keystrokeListener(event, playerAction, window);
         
-        
-        // generate enemy, use incremental random params for future rounds
-        sf::CircleShape displayEnemy = enemy.render();
-        displayEnemy.setPosition(600, 20);
-        window.draw(displayEnemy);
-        enemy.statsWindow(window,10,10);
+        sf::RectangleShape round = roundWindow(window, roundIncrementer, fontPointer); // show round counter
+        renderPlayer(player, window); // render player
+        renderEnemy(enemy, window); // render enemy
             
-        if (playerAction != 0){                                     // Battle resolution
-            if(player.getSPD() - enemy.getSPD() >= 0){              // if the player is faster
-                switch (playerAction) {
-                    case 1:
-                        player.attack(enemy);
-                        std::cout << "HIYAAAAAAAAAAAAAAAA" << std::endl;
-                        break;
-                    case 2:
-                        player.capture(enemy);
-                        break;
-                    case 3:
-                        player.debuff10(enemy);
-                        break;
-                }
-                enemy.attack(player);
-            } else {                                                // the enemy is faster
-                enemy.attack(player);
-                switch (playerAction) {
-                    case 1:
-                        player.attack(enemy);
-                        std::cout << "HIYAAAAAAAAAAAAAAAA" << std::endl;
-                        break;
-                    case 2:
-                        player.capture(enemy);
-                        break;
-                    case 3:
-                        player.debuff10(enemy);
-                        break;
-                }
-            }
-            playerAction=0;
-            assert(player.alive());
-            if(!enemy.alive()) {                                                 // if the enemy is slain/capt
-                roundIncrementer++;                                              // next round
-                enemy = Character(1 + roundIncrementer*.1, fontPointer);         // gen new enemy with 10% stronger stats
-                player.setHP(player.getHP()*1.2);                                // player regains 10% HP
-            }
-        }
-        
-        
-        
-        
+        battlePhase(enemy, fontPointer, player, playerAction, roundIncrementer);
         window.display();
     }
     return 0;
