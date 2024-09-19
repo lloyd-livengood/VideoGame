@@ -9,9 +9,9 @@
 // TODO ENEMY GENERATOR, calculate stats based on duration of "run", higher randomized stats based on run duration ** COMPLETED
 // TODO ATTACK ACTION ** COMPLETED
 // TODO Victory / Defeat Checks and screens
-        // if player HP = 0, game over
-            //TODO GAME OVER SCREEN
-        // if enemy hp = 0, Victory screen
+        // if player HP = 0, game over ** COMPLETED
+            //TODO GAME OVER SCREEN ** COMPLETED
+        // if enemy hp = 0, Victory screen ** maybe
 // TODO DEBUFF ACTION ** COMPLETED
 // TODO CAPTURE ACTION ** COMPLETED
 // TODO BUMP MOTION FOR ATTACKS
@@ -76,7 +76,6 @@ public:
     int getSPD() {return SPD;}
     int getShapeClass() {return shapeClass;}
     std::shared_ptr<sf::Font> getFont() {return font;}
-  
     // Set methods for private stats
     void setHP(int newHP) {HP = newHP;}
     void setATK(int newATK) {ATK = newATK;}
@@ -84,12 +83,11 @@ public:
     void setSPD(int newSPD) {SPD = newSPD;}
     void setShapeClass(int newShapeClass) {shapeClass = newShapeClass;}
     
-    // Define a shape to be drawn representing the character
-    sf::CircleShape render() {
+    sf::CircleShape render() { // Define a shape to be drawn representing the character
         double radius = 100; // 100 pixel max radius
         radius *= (getHP() / radius);
         if (radius > 100)
-            radius = 100;                           // TODO REWRITE TO BE MORE BETTER AND DYNAMIC
+            radius = 100; // TODO REWRITE TO BE MORE BETTER AND DYNAMIC
         sf::CircleShape shape(radius, getShapeClass());
         shape.setOutlineColor(sf::Color::White);
         shape.setOutlineThickness(5);
@@ -151,16 +149,14 @@ public:
     
     void attack(Character &rhs, std::string &combatLogString){
         int damage = ATK - rhs.getDEF(); // atk - def damage calc
-        if (damage <1){
+        if (damage <1)
             damage = 1; // damage minimum of 1 point for chip damage
-        }
         rhs.setHP(rhs.getHP()-damage);
         combatLogString += ("Damage dealt: " + std::to_string(damage) + " ");
     }
     
     void capture(Character &rhs, std::string &combatLogString){
         int captureChance = 50 - (rhs.getHP() - getHP() + rhs.getSPD() - getSPD()); // 50/50 odds at parity, modified by stats
-        
         if( captureChance > (rand() % 100)) {  // capture chance against random roll
             ATK += (rhs.getATK()*.2) + 1; // add portion of stat aggregate, +1 for int rounding
             DEF += (rhs.getDEF()*.2) + 1;
@@ -305,6 +301,15 @@ inline void playerAct(Character &enemy, Character &player, int &playerAction, st
     }
 }
 
+inline void enemyHealthCheck(Character &enemy, const std::shared_ptr<sf::Font> &fontPointer, Character &player, int &roundIncrementer) {
+    if(!enemy.alive()) { // if the enemy is slain/capt
+        std::cout << "Enemy defeated!" << std::endl;
+        roundIncrementer++; //increment next round
+        enemy = Character(.8 + pow(roundIncrementer,roundIncrementer)*.02, fontPointer);
+        player.setHP((player.getHP()*1.2) + 15); // player regains 20% HP, with 15hp min
+    }
+}
+
 static void battlePhase(Character &enemy, const std::shared_ptr<sf::Font> &fontPointer, Character &player, int &playerAction, int &roundIncrementer, std::string &combatLogString) {
     if (playerAction != 0){  // Battle resolution triggered if action is not zero IE a button is pressed
         if(player.getSPD() - enemy.getSPD() >= 0){ // if the player is faster, they attack first
@@ -329,25 +334,7 @@ static void battlePhase(Character &enemy, const std::shared_ptr<sf::Font> &fontP
             playerAct(enemy, player, playerAction, combatLogString);
             enemyHealthCheck(enemy, fontPointer, player, roundIncrementer);
         }
-    }
-    playerAction=0; // reset player action to resume "listening" for next keystroke
-}
-
-inline void enemyHealthCheck(Character &enemy, const std::shared_ptr<sf::Font> &fontPointer, Character &player, int &roundIncrementer) {
-    if(!enemy.alive()) { // if the enemy is slain/capt
-        std::cout << "Enemy defeated!" << std::endl;
-        roundIncrementer++; //increment next round
-        enemy = Character(.8 + pow(roundIncrementer,roundIncrementer)*.05, fontPointer);
-        player.setHP((player.getHP()*1.2) + 15); // player regains 20% HP, with 15hp min
-    }
-}
-
-static void gameOverCheck(const std::shared_ptr<sf::Font> &fontPointer, int playerAction, int roundIncrementer, sf::RenderWindow &window) {
-    if (playerAction == 4){                 // if player is dead
-        sf::RectangleShape gameOver = gameOverWindow(roundIncrementer, fontPointer);
-        sf::Text gameOverLine = gameOverText(roundIncrementer, fontPointer);
-        window.draw(gameOver);
-        window.draw(gameOverLine);
+        playerAction=0; // reset player action to resume "listening" for next keystroke
     }
 }
 
@@ -373,6 +360,15 @@ sf::Text gameOverText(int roundIncrementer, std::shared_ptr<sf::Font> newFont) {
   gameOverLine.setPosition(100, 300);
   gameOverLine.setFillColor(sf::Color(0, 0, 0));
   return gameOverLine;
+}
+
+static void gameOverCheck(const std::shared_ptr<sf::Font> &fontPointer, int playerAction, int roundIncrementer, sf::RenderWindow &window) {
+    if (playerAction == 4){                 // if player is dead
+        sf::RectangleShape gameOver = gameOverWindow(roundIncrementer, fontPointer);
+        sf::Text gameOverLine = gameOverText(roundIncrementer, fontPointer);
+        window.draw(gameOver);
+        window.draw(gameOverLine);
+    }
 }
 
 #endif /* character_hpp */
