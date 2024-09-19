@@ -12,7 +12,6 @@
         // if player HP = 0, game over
             //TODO GAME OVER SCREEN
         // if enemy hp = 0, Victory screen
-// TODO BUFF ACTION
 // TODO DEBUFF ACTION ** COMPLETED
 // TODO CAPTURE ACTION ** COMPLETED
 // TODO BUMP MOTION FOR ATTACKS
@@ -46,7 +45,7 @@ public:
         font = newFont;
     }
     
-    Character(double roundIncrementer, std::shared_ptr<sf::Font> newFont) {     // Constructor for enemy randGen
+    Character(double roundIncrementer, std::shared_ptr<sf::Font> newFont) { // Constructor for randGen
         int distributionTotal = 100 * roundIncrementer; // total number of points to be distributed, 10% higher each round
         
         int distribution = distributionTotal - (rand() % distributionTotal);
@@ -104,7 +103,7 @@ public:
         return shape;
     }
 
-    sf::RectangleShape statsWindow(sf::RenderWindow &window, int positionX, int positionY) {
+    void statsWindow(sf::RenderWindow &window, int positionX, int positionY) {
         sf::RectangleShape rectangle;
         rectangle.setSize(sf::Vector2f(150, 100));
         rectangle.setOutlineColor(sf::Color::Red);
@@ -148,54 +147,18 @@ public:
         window.draw(ATKLine);
         window.draw(DEFLine);
         window.draw(SPDLine);
-        return rectangle;
     }
     
-    sf::RectangleShape actionWindow(sf::RenderWindow &window) {
-        sf::RectangleShape rectangle;
-        rectangle.setSize(sf::Vector2f(150, 100));
-        rectangle.setOutlineColor(sf::Color::Blue);
-        rectangle.setOutlineThickness(3);
-        rectangle.setPosition(425, 650);
-        
-        sf::Text attack;
-        attack.setFont(*font);
-        attack.setString("1. Attack" );
-        attack.setCharacterSize(20);
-        attack.setFillColor(sf::Color::Black);
-        attack.setPosition(rectangle.getPosition().x + 10, rectangle.getPosition().y + 10);
-        
-        sf::Text capture;
-        capture.setFont(*font);
-        capture.setString("2. Capture" );
-        capture.setCharacterSize(20);
-        capture.setFillColor(sf::Color::Black);
-        capture.setPosition(rectangle.getPosition().x + 10, rectangle.getPosition().y + 30);
-        
-        sf::Text debuff10;
-        debuff10.setFont(*font);
-        debuff10.setString("3. Debuff 10%" );
-        debuff10.setCharacterSize(20);
-        debuff10.setFillColor(sf::Color::Black);
-        debuff10.setPosition(rectangle.getPosition().x + 10, rectangle.getPosition().y + 50);
-
-        window.draw(rectangle);
-        window.draw(attack);
-        window.draw(capture);
-        window.draw(debuff10);
-        return rectangle;
-    }
-    
-    void attack(Character &rhs){
+    void attack(Character &rhs, std::string &combatLogString){
         int damage = ATK - rhs.getDEF(); // atk - def damage calc
         if (damage <1){
             damage = 1; // damage minimum of 1 point for chip damage
         }
         rhs.setHP(rhs.getHP()-damage);
-        std::cout << "Damage dealt: " << damage << std::endl;
+        combatLogString += ("Damage dealt: " + std::to_string(damage) + " ");
     }
     
-    void capture(Character &rhs){
+    void capture(Character &rhs, std::string &combatLogString){
         int captureChance = 50 - (rhs.getHP() - getHP() + rhs.getSPD() - getSPD()); // 50/50 odds at parity, modified by stats
         
         if( captureChance > (rand() % 100)) {  // capture chance against random roll
@@ -204,25 +167,59 @@ public:
             SPD += (rhs.getSPD()*.2) + 1;
             shapeClass += 1;
             rhs.setHP(0); // 'kill' the enemy, and trigger new randgen
-            std::cout << "Polymon captured! You have stolen some of their stats. Finding new enemy..." << std::endl;
+            combatLogString +=  "Polymon captured! Stats Stolen! Next enemy...";
         } else {
-            std::cout << "Capture failed." << std::endl;
+            combatLogString += "Capture failed.";
         }
     }
     
-    void debuff10(Character &rhs){
+    void debuff10(Character &rhs,  std::string &combatLogString){
         rhs.setATK(rhs.getATK()*.9);
         rhs.setDEF(rhs.getDEF()*.9);
         rhs.setSPD(rhs.getSPD()*.9);
-        std::cout << "Enemy stats debuffed." << std::endl;
+        combatLogString += "Enemy stats debuffed.";
     }
     
     bool alive() {
-        return getHP() > 0;
+        return (getHP() > 0);
     }
 };
 
-sf::RectangleShape roundWindow(sf::RenderWindow &window, int roundIncrementer, std::shared_ptr<sf::Font> newFont) {
+void actionWindow(sf::RenderWindow &window, std::shared_ptr<sf::Font> newFont) {
+    sf::RectangleShape rectangle;
+    rectangle.setSize(sf::Vector2f(150, 100));
+    rectangle.setOutlineColor(sf::Color::Blue);
+    rectangle.setOutlineThickness(3);
+    rectangle.setPosition(425, 650);
+    
+    sf::Text attack;
+    attack.setFont(*newFont);
+    attack.setString("1. Attack" );
+    attack.setCharacterSize(20);
+    attack.setFillColor(sf::Color::Black);
+    attack.setPosition(rectangle.getPosition().x + 10, rectangle.getPosition().y + 10);
+    
+    sf::Text capture;
+    capture.setFont(*newFont);
+    capture.setString("2. Capture" );
+    capture.setCharacterSize(20);
+    capture.setFillColor(sf::Color::Black);
+    capture.setPosition(rectangle.getPosition().x + 10, rectangle.getPosition().y + 30);
+    
+    sf::Text debuff10;
+    debuff10.setFont(*newFont);
+    debuff10.setString("3. Debuff 10%" );
+    debuff10.setCharacterSize(20);
+    debuff10.setFillColor(sf::Color::Black);
+    debuff10.setPosition(rectangle.getPosition().x + 10, rectangle.getPosition().y + 50);
+
+    window.draw(rectangle);
+    window.draw(attack);
+    window.draw(capture);
+    window.draw(debuff10);
+}
+
+static void roundWindow(sf::RenderWindow &window, int roundIncrementer, std::shared_ptr<sf::Font> newFont) {
     sf::RectangleShape rectangle;
     rectangle.setSize(sf::Vector2f(80, 40));
     rectangle.setOutlineColor(sf::Color::Green);
@@ -239,69 +236,68 @@ sf::RectangleShape roundWindow(sf::RenderWindow &window, int roundIncrementer, s
   
     window.draw(rectangle);
     window.draw(roundLine);
-    
-    return rectangle;
 }
 
 static void renderPlayer(Character &player, sf::RenderWindow &window) {
     sf::CircleShape displayPlayer = player.render();
     displayPlayer.setPosition(130, 550);
     window.draw(displayPlayer);
-    player.statsWindow(window,800,650);
-    player.actionWindow(window);
 }
 
 static void renderEnemy(Character &enemy, sf::RenderWindow &window) {
     sf::CircleShape displayEnemy = enemy.render();
     displayEnemy.setPosition(650, 60);
     window.draw(displayEnemy);
-    enemy.statsWindow(window,10,10);
 }
 
 inline void enemyHealthCheck(Character &enemy, const std::shared_ptr<sf::Font> &fontPointer, Character &player, int &roundIncrementer) {
     if(!enemy.alive()) { // if the enemy is slain/capt
         std::cout << "Enemy defeated!" << std::endl;
         roundIncrementer++; //increment next round
-        enemy = Character(1 + roundIncrementer*.1, fontPointer); // gen new enemy with 10% stronger stats
+        enemy = Character(.8 + pow(roundIncrementer,roundIncrementer)*.05, fontPointer);
         player.setHP((player.getHP()*1.2) + 15); // player regains 20% HP, with 15hp min
     }
 }
 
-inline void playerAct(Character &enemy, Character &player, int &playerAction) {
+inline void playerAct(Character &enemy, Character &player, int &playerAction, std::string &combatLogString) {
     switch (playerAction) {
         case 1:
-            player.attack(enemy);
+            player.attack(enemy, combatLogString);
             break;
         case 2:
-            player.capture(enemy);
+            player.capture(enemy, combatLogString);
             break;
         case 3:
-            player.debuff10(enemy);
+            player.debuff10(enemy, combatLogString);
             break;
     }
 }
 
-static void battlePhase(Character &enemy, const std::shared_ptr<sf::Font> &fontPointer, Character &player, int &playerAction, int &roundIncrementer) {
+static void battlePhase(Character &enemy, const std::shared_ptr<sf::Font> &fontPointer, Character &player, int &playerAction, int &roundIncrementer, std::string &combatLogString) {
     if (playerAction != 0){  // Battle resolution triggered if action is not zero IE a button is pressed
         if(player.getSPD() - enemy.getSPD() >= 0){ // if the player is faster, they attack first
-            std::cout << "Player acts!" << std::endl;
-            playerAct(enemy, player, playerAction);
+            combatLogString = "Player acts! ";
+            playerAct(enemy, player, playerAction, combatLogString);
             enemyHealthCheck(enemy, fontPointer, player, roundIncrementer); // check enemy health after action
             
-            enemy.attack(player); // enemy attacks
-            assert(player.alive()); // probably going to be similar to enemyHealthCheck
-            
+            enemy.attack(player, combatLogString); // enemy attacks
+            if(!player.alive()){
+                playerAction = 4;
+                return;
+            }
         } else {
-            std::cout << "Enemy attacks!" << std::endl;
-            enemy.attack(player); // the enemy is faster and attacks first
-            assert(player.alive()); // probably going to be similar to enemyHealthCheck
-            
-            std::cout << "Player acts!" << std::endl;
-            playerAct(enemy, player, playerAction);
+            combatLogString = "Enemy attacks! ";
+            enemy.attack(player, combatLogString); // the enemy is faster and attacks first
+            if(!player.alive()){
+                playerAction = 4;
+                return;
+            }
+            combatLogString +=  "Player acts! ";
+            playerAct(enemy, player, playerAction, combatLogString);
             enemyHealthCheck(enemy, fontPointer, player, roundIncrementer);
         }
-        playerAction=0; // reset player action to resume "listening" for next keystroke
     }
+    playerAction=0; // reset player action to resume "listening" for next keystroke
 }
 
 static void keystrokeListener(sf::Event &event, int &playerAction, sf::RenderWindow &window) {
@@ -326,6 +322,56 @@ static std::shared_ptr<sf::Font> fontLoader() { // font loader
     sf::Font& fontRef = *fontPointer;
     (*fontPointer).loadFromFile("ProtestGuerrilla-Regular.ttf");
     return fontPointer;
+}
+
+sf::RectangleShape gameOverWindow(int roundIncrementer, std::shared_ptr<sf::Font> newFont) {
+  sf::RectangleShape rectangle;
+  rectangle.setSize(sf::Vector2f(1000, 800));
+  rectangle.setFillColor(sf::Color(255, 0, 0));
+  sf::Text roundLine;
+  std::string roundString = std::to_string(roundIncrementer + 1);
+  roundLine.setFont(*newFont);
+  roundLine.setString("Round: " + roundString);
+  roundLine.setCharacterSize(15);
+  roundLine.setFillColor(sf::Color::Black);
+  roundLine.setPosition(rectangle.getPosition().x + 10, rectangle.getPosition().y + 10);
+  return rectangle;
+}
+
+sf::Text gameOverText(int roundIncrementer, std::shared_ptr<sf::Font> newFont) {
+  sf::Text gameOverLine;
+  gameOverLine.setString("Game Over at Round: " + std::to_string(roundIncrementer+1));
+  gameOverLine.setCharacterSize(80);
+  gameOverLine.setFont(*newFont);
+  gameOverLine.setPosition(100, 300);
+  gameOverLine.setFillColor(sf::Color(0, 0, 0));
+  return gameOverLine;
+}
+
+static void gameOverCheck(const std::shared_ptr<sf::Font> &fontPointer, int playerAction, int roundIncrementer, sf::RenderWindow &window) {
+    if (playerAction == 4){                 // if player is dead
+        sf::RectangleShape gameOver = gameOverWindow(roundIncrementer, fontPointer);
+        sf::Text gameOverLine = gameOverText(roundIncrementer, fontPointer);
+        window.draw(gameOver);
+        window.draw(gameOverLine);
+    }
+}
+
+static void combatLog(const std::string &combatLogString, const std::shared_ptr<sf::Font> &fontPointer, sf::RenderWindow &window) {
+    sf::RectangleShape combatLog;
+    combatLog.setSize(sf::Vector2f(1000, 40));
+    combatLog.setFillColor(sf::Color(0, 0, 0));
+    combatLog.setFillColor(sf::Color::Black);
+    combatLog.setPosition(0, 760);
+    window.draw(combatLog);
+    
+    sf::Text combatLogText;
+    combatLogText.setString(combatLogString);
+    combatLogText.setCharacterSize(20);
+    combatLogText.setFont(*fontPointer);
+    combatLogText.setPosition(10, 762);
+    combatLogText.setFillColor(sf::Color::White);
+    window.draw(combatLogText);
 }
 
 #endif /* character_hpp */
