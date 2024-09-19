@@ -185,6 +185,30 @@ public:
     }
 };
 
+static void keystrokeListener(sf::Event &event, int &playerAction, sf::RenderWindow &window) {
+    while (window.pollEvent(event)) { // listening to key presses
+        if (event.type == sf::Event::Closed)
+            window.close();
+        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num1 ) {
+            playerAction = 1;
+        }
+        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num2) {
+            playerAction = 2;
+        }
+        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num3) {
+            playerAction = 3;
+        }
+    }
+}
+
+static std::shared_ptr<sf::Font> fontLoader() { // font loader
+    sf::Font* font = new sf::Font();
+    std::shared_ptr<sf::Font> fontPointer(font);
+    sf::Font& fontRef = *fontPointer;
+    (*fontPointer).loadFromFile("ProtestGuerrilla-Regular.ttf");
+    return fontPointer;
+}
+
 void actionWindow(sf::RenderWindow &window, std::shared_ptr<sf::Font> newFont) {
     sf::RectangleShape rectangle;
     rectangle.setSize(sf::Vector2f(150, 100));
@@ -250,13 +274,21 @@ static void renderEnemy(Character &enemy, sf::RenderWindow &window) {
     window.draw(displayEnemy);
 }
 
-inline void enemyHealthCheck(Character &enemy, const std::shared_ptr<sf::Font> &fontPointer, Character &player, int &roundIncrementer) {
-    if(!enemy.alive()) { // if the enemy is slain/capt
-        std::cout << "Enemy defeated!" << std::endl;
-        roundIncrementer++; //increment next round
-        enemy = Character(.8 + pow(roundIncrementer,roundIncrementer)*.05, fontPointer);
-        player.setHP((player.getHP()*1.2) + 15); // player regains 20% HP, with 15hp min
-    }
+static void combatLog(const std::string &combatLogString, const std::shared_ptr<sf::Font> &fontPointer, sf::RenderWindow &window) {
+    sf::RectangleShape combatLog;
+    combatLog.setSize(sf::Vector2f(1000, 40));
+    combatLog.setFillColor(sf::Color(0, 0, 0));
+    combatLog.setFillColor(sf::Color::Black);
+    combatLog.setPosition(0, 760);
+    window.draw(combatLog);
+    
+    sf::Text combatLogText;
+    combatLogText.setString(combatLogString);
+    combatLogText.setCharacterSize(20);
+    combatLogText.setFont(*fontPointer);
+    combatLogText.setPosition(10, 762);
+    combatLogText.setFillColor(sf::Color::White);
+    window.draw(combatLogText);
 }
 
 inline void playerAct(Character &enemy, Character &player, int &playerAction, std::string &combatLogString) {
@@ -301,28 +333,22 @@ static void battlePhase(Character &enemy, const std::shared_ptr<sf::Font> &fontP
     playerAction=0; // reset player action to resume "listening" for next keystroke
 }
 
-static void keystrokeListener(sf::Event &event, int &playerAction, sf::RenderWindow &window) {
-    while (window.pollEvent(event)) { // listening to key presses
-        if (event.type == sf::Event::Closed)
-            window.close();
-        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num1 ) {
-            playerAction = 1;
-        }
-        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num2) {
-            playerAction = 2;
-        }
-        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Num3) {
-            playerAction = 3;
-        }
+inline void enemyHealthCheck(Character &enemy, const std::shared_ptr<sf::Font> &fontPointer, Character &player, int &roundIncrementer) {
+    if(!enemy.alive()) { // if the enemy is slain/capt
+        std::cout << "Enemy defeated!" << std::endl;
+        roundIncrementer++; //increment next round
+        enemy = Character(.8 + pow(roundIncrementer,roundIncrementer)*.05, fontPointer);
+        player.setHP((player.getHP()*1.2) + 15); // player regains 20% HP, with 15hp min
     }
 }
 
-static std::shared_ptr<sf::Font> fontLoader() { // font loader
-    sf::Font* font = new sf::Font();
-    std::shared_ptr<sf::Font> fontPointer(font);
-    sf::Font& fontRef = *fontPointer;
-    (*fontPointer).loadFromFile("ProtestGuerrilla-Regular.ttf");
-    return fontPointer;
+static void gameOverCheck(const std::shared_ptr<sf::Font> &fontPointer, int playerAction, int roundIncrementer, sf::RenderWindow &window) {
+    if (playerAction == 4){                 // if player is dead
+        sf::RectangleShape gameOver = gameOverWindow(roundIncrementer, fontPointer);
+        sf::Text gameOverLine = gameOverText(roundIncrementer, fontPointer);
+        window.draw(gameOver);
+        window.draw(gameOverLine);
+    }
 }
 
 sf::RectangleShape gameOverWindow(int roundIncrementer, std::shared_ptr<sf::Font> newFont) {
@@ -347,32 +373,6 @@ sf::Text gameOverText(int roundIncrementer, std::shared_ptr<sf::Font> newFont) {
   gameOverLine.setPosition(100, 300);
   gameOverLine.setFillColor(sf::Color(0, 0, 0));
   return gameOverLine;
-}
-
-static void gameOverCheck(const std::shared_ptr<sf::Font> &fontPointer, int playerAction, int roundIncrementer, sf::RenderWindow &window) {
-    if (playerAction == 4){                 // if player is dead
-        sf::RectangleShape gameOver = gameOverWindow(roundIncrementer, fontPointer);
-        sf::Text gameOverLine = gameOverText(roundIncrementer, fontPointer);
-        window.draw(gameOver);
-        window.draw(gameOverLine);
-    }
-}
-
-static void combatLog(const std::string &combatLogString, const std::shared_ptr<sf::Font> &fontPointer, sf::RenderWindow &window) {
-    sf::RectangleShape combatLog;
-    combatLog.setSize(sf::Vector2f(1000, 40));
-    combatLog.setFillColor(sf::Color(0, 0, 0));
-    combatLog.setFillColor(sf::Color::Black);
-    combatLog.setPosition(0, 760);
-    window.draw(combatLog);
-    
-    sf::Text combatLogText;
-    combatLogText.setString(combatLogString);
-    combatLogText.setCharacterSize(20);
-    combatLogText.setFont(*fontPointer);
-    combatLogText.setPosition(10, 762);
-    combatLogText.setFillColor(sf::Color::White);
-    window.draw(combatLogText);
 }
 
 #endif /* character_hpp */
