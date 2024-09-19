@@ -281,6 +281,7 @@ static void battlePhase(Character &enemy, const std::shared_ptr<sf::Font> &fontP
             enemyHealthCheck(enemy, fontPointer, player, roundIncrementer); // check enemy health after action
             
             enemy.attack(player, combatLogString); // enemy attacks
+            combatLogString +=  "Enemy attacks! ";
             if(!player.alive()){
                 playerAction = 4;
                 return;
